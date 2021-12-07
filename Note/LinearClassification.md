@@ -356,7 +356,49 @@ $$
 
 [实验报告](../PDF/LogisticRegressionAndNaiveBayes.pdf)
 
+## 4. 高斯判别分析（Gaussian Discriminant Analysis）
+
+高斯判别分析属于是**概率生成模型**，概率判别模型是主要是求出y=0的概率和y=1的概率$\hat{y}=\argmax_{y\in \{ 0,1 \}} P(y|x)$。
+
+生成模型不是直接求出$P(Y|X)$而关心的是$P(y=0|x)$和$P(y=1|x)$两者谁大，并不是求一个确切的大小，所以可以通过贝叶斯公式$P(y|x)=\frac{P(x|y)P(y)}{P(x)}$去比较大小
+
+而其中的$P(x)$并与y实际上是没有关系的，所以可以得到$P(y|x)\propto P(x|y)P(y)$，而$P(y|x)\propto P(x|y)P(y)$实际上就是联合概率$P(x,y)$，所以主要就是对联合概率进行建模。
+
+所以$P(y)$可以认为是先验prior, $P(y|x)$可以认为是似然likelihood，$P(y|x)$就是后验posterior
+
+也就是让后验最大化
+
+$$
+\hat{y} = \argmax_{y\in \{ 0,1 \}} P(y|x) = \argmax_y P(y)P(x|y)
+$$
+
+### 4.1 模型定义
+
+高斯判别分析主要是假设$y$满足伯努利分布$y \sim Bernoulli (\Phi)$，假设$x|y$满足高斯分布 $x|y=1 \sim N(\mu_1, \Sigma)$，$x|y=0 \sim N(\mu_2, \Sigma)$
+
+直接写出参数$\theta$的对数似然函数
+
+$$
+\begin{aligned}
+log-likelihood:l(\theta) &= \log \prod_{i=1}^{N}P(x_i,y_i) \\
+&= \sum_{i=1}^{N} \log (P(x_i|y_i P(y_i))) \\
+&= \sum_{i=1}^{N} [\log P(x_i|y_i) + \log P(y_i)] \\
+&= \sum_{i=1}^{N} [\log N(\mu_1,\Sigma)^{y_i}N(\mu_2,\Sigma)^{1-y_i} + \log \Phi^{y_i}(1-\Phi^{1-y_i})] \\
+&= \sum_{i=1}^{N} [\log N(\mu_1,\Sigma)^{y_i} +\log N(\mu_2,\Sigma)^{1-y_i} + \log \Phi^{y_i}(1-\Phi^{1-y_i})] 
+\end{aligned}
+$$
+
+这里$\theta$可以写成一个元组的形式$\theta=(\mu_1,\mu_2,\Sigma,\Phi)$
+
+求解目标就是$\hat{\theta}=\argmax_\theta l(\theta)$
+
+### 4.2 模型求解
+
+
+
 ## 参考资料
+
+[机器学习-白板推导系列(四)-线性分类（Linear Classification）_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV15W41127L2?spm_id_from=333.999.0.0)
 
 [逻辑回归（logistic regression）原理详解_guoziqing506的博客-CSDN博客_逻辑回归原理](https://blog.csdn.net/guoziqing506/article/details/81328402?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522163888824516780255271123%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=163888824516780255271123&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-3-81328402.pc_search_result_cache&utm_term=%E9%80%BB%E8%BE%91%E5%9B%9E%E5%BD%92&spm=1018.2226.3001.4187)
 
