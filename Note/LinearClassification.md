@@ -83,6 +83,8 @@ $$
 
 ## 2. 线性判别分析
 
+### 2.1 思想
+
 先对数据符号做一些假设（设定）
 
 X是数据特征集合，$N\times p$的矩阵
@@ -117,3 +119,75 @@ $$
 
 上面所说的类内小，实际上就是让类内的方差尽量的小，也就是同一类的映射之后越紧凑越好。想法类间大就是不同类之间月松散越好。
 
+### 2.2 loss function 的构建
+
+假设点映射到超平面的值是$z_i=w^Tx_i$
+
+则
+$$
+\overline{z}=\frac{1}{N}\sum_{i=1}^{N}z_i=\frac{1}{N} \sum_{i=1}^{N} w^Tx_i
+$$
+
+$z$的方差可以表示为$S_z$
+
+$$
+\begin{aligned}
+S_z &= \frac{1}{N}\sum_{i=1}^{N}(z_i-\overline{z})(z_i-\overline{z})^T \\
+&= \frac{1}{N}\sum_{i=1}^{N}(w^Tx_i-\overline{z})(w^Tx_i-\overline{z})^T
+\end{aligned}
+$$
+
+可以把X根据Y的不同分为两个集合，$x_{c1}=\{ x_i|y_i=+1 \}$,$x_{c2}=\{ x_i|y_i=-1 \}$
+
+$|x_{c1}|=N_1$,\ $|x_{c2}|=N_2$,\ $N_1+N_2=N$
+
+所以可以分别计算$c_1$和$c_2$的均值以及方差
+
+$$
+\begin{aligned}
+  c_1:\overline{z_1} &= \frac{1}{N_1}\sum_{i=1}^{N_1}w^Tx_i \\
+  S_1 &= \frac{1}{N_1}\sum_{i=1}^{N_1}(w^Tx_i-\overline{z_1})(w^Tx_i-\overline{z_1})^T \\
+  c_2:\overline{z_2} &= \frac{1}{N_2}\sum_{i=1}^{N_2}w^Tx_i \\
+  S_2 &= \frac{1}{N_2}\sum_{i=1}^{N_2}(w^Tx_i-\overline{z_2})(w^Tx_i-\overline{z_2})^T \\
+\end{aligned}
+$$
+
+类间大，可以理解为是让$c_1$和$c_2$之间的均值差距大，用$(\overline{z_1}-\overline{z_2})^2$表示
+
+类内小：可以表示为让每个$S$都小，用$S_1+S_2$表示
+
+所以可以构建出目标函数就是
+
+$$
+J(w)=\frac{(\overline{z_1}-\overline{z_2})^2}{S_1+S_2} \\
+$$
+
+而优化目标就是
+$$
+\hat{w}=arg\max_w J(w)
+$$
+
+将$\overline{Z_1}$, $\overline{Z_2}$, $S_1$,$S_2$都代入$J(w)$进一步推导
+
+$$
+\begin{aligned}
+J(w) &= \frac{(\overline{z_1}-\overline{z_2})^2}{S_1+S_2} \\
+分子 &= ( \frac{1}{N_1}\sum_{i=1}^{N_1}w^Tx_i - \frac{1}{N_2}\sum_{i=1}^{N_2}w^Tx_i )^2 \\
+&=[w^T(\frac{1}{N_1}\sum_{i=1}^{N_1}x_i - \frac{1}{N_2}\sum_{i=1}^{N_2}x_i)]^2 \\
+&=[w^T(\overline{x_{c_1}} - \overline{x_{c_2}})]^2 \\
+&=w^T(\overline{x_{c_1}} - \overline{x_{c_2}})(\overline{x_{c_1}} - \overline{x_{c_2}})^Tw\\
+分母&=S_1+S_2 \\
+S_1 &= \frac{1}{N_1}\sum_{i=1}^{N_1}(w^Tx_i-\overline{z_1})(w^Tx_i-\overline{z_1})^T \\
+&= \frac{1}{N_1}\sum_{i=1}^{N_1}w^T(x_i-\overline{x_{c_1}})(x_i-\overline{x_{c_1}})^Tw \\
+&= w^T [\frac{1}{N_1}\sum_{i=1}^{N_1}(x_i-\overline{x_{c_1}})(x_i-\overline{x_{c_1}})^T]w \\
+&= w^T S_{c_1}w\\
+分母 &=w^T S_{c_1}w+w^T S_{c_2}w \\
+&= w^T (S_{c_1}+S_{c_2})w
+\end{aligned}
+$$
+
+可以得到：
+
+$$
+J(w) = \frac{w^T(\overline{x_{c_1}} - \overline{x_{c_2}})(\overline{x_{c_1}} - \overline{x_{c_2}})^Tw}{w^T (S_{c_1}+S_{c_2})w}
+$$
