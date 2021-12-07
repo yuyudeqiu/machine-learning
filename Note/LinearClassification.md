@@ -8,7 +8,7 @@
 
 比如打破**全局线性**的特点即**全局非线性**，就变成了**线性分类（激活函数是非线性）**
 
-![](imge/LogisticRegression_1.png)
+![](imge/LinearClassification_1.png)
 
 
 线性分类，可以看成**线性回归通过激活函数**带来了分类的效果，也可以看作是把数据**降维**然后根据阈值判断类别。
@@ -37,13 +37,13 @@ $$
 \end{cases}
 $$
 
-## 1. 感知机模型
+## 1. 感知机模型（Perceptron Algorithm）
 
 感知机的思想是**错误驱动**。
 
 假定一个数据集是**线性可分**的，如图：
 
-![](imge/LogisticRegression_2.png)
+![](imge/LinearClassification_2.png)
 
 初始化一个$w$，一开始是会有错误分类的，然后根据被错误分类的样本集$D$，一步步优化$w$，直到找到一个正确分类的超平面。
 
@@ -81,7 +81,7 @@ w^{t+1} \leftarrow w^{t} -\lambda \nabla_wL \\
 即w^{t+1} \leftarrow w^{t} +\lambda  y_i x_i \\
 $$
 
-## 2. 线性判别分析
+## 2. 线性判别分析（Linear Discriminant Analysis）
 
 ### 2.1 思想
 
@@ -109,11 +109,17 @@ Y=\begin{pmatrix}
 \end{pmatrix}
 $$
 
+数据集可以表示为：
+$$
+\{ (x_i,y_i) \}_{i=1}^{N}\\
+x_i是p维的，y_i\in \{ +1, -1 \}
+$$
+
 线性判别分析的思想可以总结为：**类内小，类间大**
 
 实际上可以理解为一个降维再分类的一个过程。
 
-![](imge/LogisticRegression_3.png)
+![](imge/LinearClassification_3.png)
 
 比如上图，可以通过将坐标轴XY上的点映射到红色的坐标轴上变成一维，再选取适合的阈值进行分类。优化目标自然是找到适合投影的一个方向。而从图中，阈值的点，垂直于映射平面的超平面就是所求的分类的超平面，如图蓝色的线。
 
@@ -139,9 +145,9 @@ $$
 
 可以把X根据Y的不同分为两个集合，$x_{c1}=\{ x_i|y_i=+1 \}$,$x_{c2}=\{ x_i|y_i=-1 \}$
 
-$|x_{c1}|=N_1$,\ $|x_{c2}|=N_2$,\ $N_1+N_2=N$
+$|x_{c1}|=N_1$,\ $|x_{c2}|=N_2$, $N_1+N_2=N$
 
-所以可以分别计算$c_1$和$c_2$的均值以及方差
+所以可以分别计算$c_1$和$c_2$的均值以及方差$\overline{x_{c_1}}$，$\overline{x_{c_2}}$，$S_{c_1}$，$S_{c_2}$
 
 $$
 \begin{aligned}
@@ -189,5 +195,168 @@ $$
 可以得到：
 
 $$
-J(w) = \frac{w^T(\overline{x_{c_1}} - \overline{x_{c_2}})(\overline{x_{c_1}} - \overline{x_{c_2}})^Tw}{w^T (S_{c_1}+S_{c_2})w}
+\begin{aligned}
+J(w) &=\frac{(\overline{z_1}-\overline{z_2})^2}{S_1+S_2}\\
+&= \frac{w^T(\overline{x_{c_1}} - \overline{x_{c_2}})(\overline{x_{c_1}} - \overline{x_{c_2}})^Tw}{w^T (S_{c_1}+S_{c_2})w}  
+\end{aligned}
 $$
+
+### 2.3 目标函数求解
+
+得到目标函数之后，就可开始对模型进行求解了。
+
+$$
+\begin{aligned}
+J(w) &=\frac{(\overline{z_1}-\overline{z_2})^2}{S_1+S_2}\\
+&= \frac{w^T(\overline{x_{c_1}} - \overline{x_{c_2}})(\overline{x_{c_1}} - \overline{x_{c_2}})^Tw}{w^T (S_{c_1}+S_{c_2})w}  \\
+&=\frac{w^TS_bw}{w^TS_ww}
+\end{aligned} 
+$$
+
+$S_b$：between-class 内类方差
+
+$S_w$：with-class 类内方差
+
+对$J(w)$求导：
+
+$$
+\begin{aligned}
+  J(w) &= \frac{w^TS_bw}{w^TS_ww} \\
+  &= w^TS_bw(w^TS_ww)^{-1}
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+  \frac{\partial{J(w)}}{\partial{w}} &= S_bw(w^TS_ww)^{-1} - w^TS_bw(w^TS_ww)^{-2}S_ww=0 \\  
+\end{aligned}
+$$
+
+可得：
+
+$$
+\begin{aligned}
+  w^TS_bwS_ww &=S_bw(w^TS_ww) \\
+\end{aligned}
+$$
+
+到这一步，可以发现$w^TS_bw$和$(w^TS_ww)$实际上都是实数，所以：
+
+$$
+\begin{aligned}
+  S_ww &= \frac{w^TS_ww}{w^TS_bw}S_bw \\
+  w &= \frac{w^TS_ww}{w^TS_bw}S_w^{-1}S_bw
+\end{aligned}
+$$
+
+由于这个求解的$w$并不在意它的大小，而是需要求解的是他的一个方向，所以可以忽略实数部分对w方向的影响。进而得到：
+
+$$
+\begin{aligned}
+w &\propto S_w^{-1}S_bw \\
+  &\propto (\overline{x_{c_1}} - \overline{x_{c_2}})(\overline{x_{c_1}} - \overline{x_{c_2}})^Tw \\
+  &\propto S_w^{-1}(\overline{x_{c_1}} - \overline{x_{c_2}})
+\end{aligned}
+$$
+
+从第二行到第三行的变换是同理之上的 因为$(\overline{x_{c_1}} - \overline{x_{c_2}})^Tw$的结果也是一个实数，对求解w的方向来说无影响，直接丢掉。
+
+## 3. 逻辑回归（Logistics Regression）
+
+### 3.1 sigmoid function
+
+如上面感知机所说，线性分类可以是由线性回归加上激活函数变成，而逻辑回归的一个激活函数正是sigmoid函数
+
+$$
+\sigma(z)=\frac{1}{1+e^{-z}}
+$$
+
+函数图像如下：
+
+![](imge/LinearClassification_4.png)
+
+
+不同于感知机的激活函数sign，sigmod是可导的。
+
+使用sigmoid函数的好处：
+
+假设一个二分类问题，使用sigmoid函数后两个类别的概率是这样表达：
+
+$p_0=P(y=0|x)=\sigma(w^Tx)=\frac{1}{1+e^{-w^Tx}},\ y=0$
+
+$p_1=P(y=1|x)=\sigma(w^Tx)=\frac{e^{-w^Tx}}{1+e^{-w^Tx}},\ y=1$
+
+可以发现，这样好好处是使得$p_1$和$p_0$相加一定是=1的，并且$p_1$和$p_0$一定是处于0-1之间的，可以表示为概率。
+
+### 3.2 参数估计
+
+将上面的$p_1$和$p_0$可以合并为一项：
+
+$$
+P(y|x) = p_1^yp_0^{1-y}
+$$
+
+先设$p_1=\pi(x)$，则$p_0=1 - \pi(x)$
+
+似然函数：
+
+$$
+\begin{aligned}
+  \prod_{i=1}^{N}[\pi(x_i)]^{y_i}[1-\pi(x_i)]^{1-y_i}
+\end{aligned}
+$$
+
+对数似然函数：
+$$
+\begin{aligned}
+  L(w) &= \log \prod_{i=1}^{N}[\pi(x_i)]^{y_i}[1-\pi(x_i)]^{1-y_i} \\
+  &= \sum_{i=1}^{N} [y_i \log \pi(x_i) + (1-y_i) \log (1-\pi(x_i))] \\
+  &= \sum_{i=1}^{N} [\log \frac{\pi(x_i)}{1-\pi(x_i)} + \log (1-\pi(x_i))] \\
+  &= \sum_{i=1}^{N} [-y_iw^Tx_i + \log (1+e^{-w^Tx}) ] \\
+  &= \sum_{i=1}^{N} -[y_iw^Tx_i - \log (1+e^{-w^Tx}) ]
+\end{aligned}
+$$
+
+实际上这个可以理解为似然函数也可以理解为是一个loss function，那么目标就很明确了
+
+对似然函数的w求偏导：
+
+$$
+\frac{\partial L(w)}{\partial w} = - \sum_{i=1}^{N} (y_ix_i - \frac{x_i e^{w^Tx}}{1+e^{w^Tx_i}}) = 0
+$$
+
+然后就是梯度下降法更新权重。。。
+
+$$
+w := w+\lambda \sum(y_i - \frac{x_ie^{w^Tx}}{1+e^{w^Tx_i}})
+$$
+
+
+    其实这个地方不太懂，不怎么理解为什么似然函数可以看作是loss function。。。
+
+### 3.3 最大熵模型
+
+逻辑回归的终极目标就是求解最大的$P(Y|X)$
+
+而熵的公式是：$H(P)=-\sum_{x,y}P(x)\log P(x)$
+
+将上面式子替换到熵公式里面：
+
+$$
+H(P) = -\sum_{x,y} P(y|x)\log P(y|x)
+$$
+
+不是很会。。。。
+
+### 3.4 代码以及实验资料
+
+这里刚好实验课需要写，就东拼西凑了一下。。。大概能写出来。。。不过好像不太靠谱。看看就好。这个实验也包含了朴素贝叶斯的内容，两个写到一起了。懒得分开就凑合着吧。。。
+
+[实验代码链接](../Code/LogisticRegressionAndNaiveBayes.ipynb)
+
+[实验报告](../PDF/LogisticRegressionAndNaiveBayes.pdf)
+
+## 参考资料
+
+[逻辑回归（logistic regression）原理详解_guoziqing506的博客-CSDN博客_逻辑回归原理](https://blog.csdn.net/guoziqing506/article/details/81328402?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522163888824516780255271123%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=163888824516780255271123&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-3-81328402.pc_search_result_cache&utm_term=%E9%80%BB%E8%BE%91%E5%9B%9E%E5%BD%92&spm=1018.2226.3001.4187)
+
