@@ -12,3 +12,11 @@
    
    线性分类：主要应该会记几个模型，最简单的**感知机**、**线性判别分析**、**高斯判别分析**和**朴素贝叶斯**
 
+学习过程大概是参考以下的资料，还有一些博客之类的具体在每一个笔记中注明了
+
+[【机器学习】【白板推导系列】【合集 1～23】_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1aE411o7qd?p=20&spm_id_from=pageDriver)
+
+[【斯坦福大学】CS229 机器学习 · 2018年（完结·中英字幕·机翻）_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1JE411w7Ub?from=search&seid=13573621053938538889&spm_id_from=333.337.0.0)
+
+[【课程电子书课件见置顶评论】李航《统计学习方法》啃书指导~《统计学习方法》第二版啃书指导视频~_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1i4411G7Xv?from=search&seid=902836537084029287&spm_id_from=333.337.0.0)
+
