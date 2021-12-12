@@ -149,3 +149,9 @@ CART剪枝算法由两步组成：
 2. 通过交叉验证法在独立的验证数据集上对子树序列进行测试，从中选择最优子树
 
 ![](image/../imge/DecisionTree_17.png)
+
+
+### 参考资料
+
+- [带读 李航 《统计学习方法 第二版》 第五章 决策树 跟我一起学习成长为大神_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1RC4y1p7wX?p=9&spm_id_from=pageDriver)
+- 《统计学习方法（第二版）》
