@@ -65,5 +65,100 @@ $$
 ![](image/../imge/SVM_1.png)
 ![](image/../imge/SVM_2.png)
 
+
+**支持向量**：
+
+支持向量实际上就是落在**间隔边界**上的样本点，关于间隔边界的就是约束最优化问题种的约束条件，等号成立的时候，即$y_i(wx_i+b)-1 = 0$。支持向量就是落在两条线上，这两天线之间就是间隔边界。
+
+![](imge/SVM_4.png)
+
+实际上再决定分类超平面时，只有支持向量起作用，离超平面远的那些点没有作用，甚至可能把这些点直接删掉也不影响结果。
+
 **学习的对偶算法**：
 
+跟感知机一样，SVM也有学习的对偶算法，使得更容易求解。然后SVM使用对偶形式的另一个原因是可以引入和函数，然后推广到非线性分类
+
+由上述式子得到拉格朗日函数（没学仔细学过但是大概知道有这么一个公式能用。。。）：
+
+$$
+L(w,b,\alpha) = \frac{1}{2}||w||^2 - \sum_{i=1}^{N}\alpha_iy_i(wx_i+b)+\sum_{i=1}^{N}\alpha_i
+$$
+
+其中的$\alpha = (\alpha_1,\alpha_2,...,\alpha_N)^T$是拉格朗日乘子向量。
+
+原始问题的对偶问题是极大极小问题：
+
+$$
+\max_\alpha \min_{w,b} L(w,b,\alpha)
+$$
+
+要先对$L(w,b,\alpha)$求$w,b$的极小，然后再对$\alpha$求极大。
+
+求偏导 = 0：
+
+$$
+\begin{aligned}
+  &\nabla_wL(w,b,\alpha) = w - \sum_{i=1}^{N}\alpha_iy_ix_i = 0 \\
+  &\nabla_bL(w,b,\alpha) = - \sum_{i=1}^{N}\alpha_iy_i=0
+\end{aligned}
+$$
+
+得到：
+
+$$
+\begin{aligned}
+  & w = \sum_{i=1}^{N}\alpha_iy_ix_i \\ 
+  & \sum_{i=1}^{N}\alpha_iy_ix_i
+\end{aligned}
+$$
+
+带入到拉格朗日函数，最后简化得到：
+
+$$
+\min_{w,b}L(w,b,\alpha) = - \frac{1}{2} \sum_{i=1}^{N} \sum_{j=1}^{N} \alpha_i\alpha_jy_iy_j(x_ix_j) + \sum_{i=1}^{N}\alpha_i
+$$
+
+求$\min_{w,b}(w,b,\alpha)$ 对$\alpha$的极大，即是对偶问题
+
+$$
+\begin{aligned}
+  & \max_\alpha - \frac{1}{2} \sum_{i=1}^{N} \sum_{j=1}^{N} \alpha_i \alpha_j y_i y_j (x_i x_j) + \sum_{i=1}^{N} \alpha_i \\
+  & s.t. \  \sum_{i=1}^{N} \alpha y_i = 0 \\
+  & \alpha_i >= 0, \ i=1,2,...,N
+\end{aligned}
+$$
+
+转换成求极小的等价问题：
+
+$$
+\begin{aligned}
+  & \min_\alpha  \frac{1}{2} \sum_{i=1}^{N} \sum_{j=1}^{N} \alpha_i \alpha_j y_i y_j (x_i x_j) - \sum_{i=1}^{N} \alpha_i \\
+  & s.t. \  \sum_{i=1}^{N} \alpha y_i = 0 \\
+  & \alpha_i >= 0, \ i=1,2,...,N
+\end{aligned}
+$$
+
+通过定理C.3 看KT条件成立，可以得到原始最优化问题的解$w^*,b^*$：
+
+$$
+\begin{aligned}
+  & w^* = \sum_{i=1}^{N} \alpha_i^*y_ix_i \\
+  & b^* = y_i - \sum_{i=1}^{N}\alpha_i^*y_i(x_ix_j)
+\end{aligned}
+$$
+
+分类决策最后写出来就是：
+
+$$
+f(x) = sign(\sum_{i=1}^{N}\alpha_i^*y_i(xx_i)+b^*)
+$$
+
+![](./image/../imge/SVM_3.png)
+
+可以看到线性可分支持向量机种，$w^*和b^*$只依赖于训练集种对应于$\alpha_i^*>0$ 的样本点 $(x_i,x_j)$，而其他样本点对 $w^*$ 和 $b^*$没有影响。$\alpha_i^*>0$的实例点$x_i \in R^n$ 称之为支持向量。
+
+### 线性支持向量机（软间隔最大化）
+
+很多时候，数据都是线性不可分的，存在一些噪声或特异点，出去这些点后大部分样本还是基本线性可分的。对于这样的数据集，就可以使用软间隔最大化来学习。
+
+对硬间隔最大化的约束条件再引进一个松弛变量
